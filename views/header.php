@@ -9,6 +9,7 @@
 </head>
 <body>
 <div class="container-fluid">
+    <?php if($_SESSION['role'] == 1 || $_SESSION['role'] == 0):?>
     <div class="row content">
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
@@ -29,6 +30,7 @@
                 </div><!-- /.container-fluid -->
             </nav>
     </div>
+    <?php endif; ?>
     <div class="row content">
         
         
