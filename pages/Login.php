@@ -7,7 +7,9 @@ class Login extends AbstractPage
 
     protected function content()
     {
+        var_dump($_POST);
         $check = Post::checkUser($_POST['username'], $_POST['password']);
         if ($check != -1) header("Location: ./index.php?page=Index");
+        var_dump($check);
     }
 }

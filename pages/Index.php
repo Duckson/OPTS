@@ -6,6 +6,7 @@ class Index extends AbstractPage
 
     protected function content()
     {
+        if ($_SESSION['role'] = -1) header("Location: ./index.php?page=Login");
         
     }
 }

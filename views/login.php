@@ -1,7 +1,7 @@
 <div class="col-sm-12">
-    <form action="<?=htmlspecialchars("index.php?page=Login")?>" method="post">
-        Username: <input type="text" name="username"><br>
-        Password: <input type="text" name="password"><br>
+    <form action="index.php?page=Login" method="post">
+        Username: <input type="text" name="username" title="username"><br>
+        Password: <input type="password" name="password" title="password"><br>
         <input type="submit">
     </form>
 </div>

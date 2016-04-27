@@ -83,12 +83,13 @@ class Post
 
     public static function checkUser($username, $password) {
         $sql = new mysqli('localhost', 'root', 'root', "practice");
+        var_dump($password);
+        $password = md5($password);
         $result = $sql->query("SELECT role FROM users WHERE login='$username' AND password='$password'");
         $result = $result->fetch_array();
 
         if($result != 0){
             $_SESSION['role'] = $result['role'];
-            var_dump($_SESSION['role']);
             $_SESSION['username'] = $username;
         } else $_SESSION['role'] = -1;
         return $_SESSION['role'];
