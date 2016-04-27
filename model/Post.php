@@ -76,22 +76,31 @@ class Post
 
     public static function Loader($class)
     {
-        $path = '/pages/';
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/OPTS/pages/';
 
         include $path . $class . '.php';
     }
 
     public static function checkUser($username, $password) {
-        $sql = new mysqli('localhost', 'root', 'root', "practice");
-        var_dump($password);
+        $sql = Config::get()->db;;
         $password = md5($password);
         $result = $sql->query("SELECT role FROM users WHERE login='$username' AND password='$password'");
 
         if($result != 0){
             $result = $result->fetch_array();
-            $_SESSION['role'] = $result['role'];
-            $_SESSION['username'] = $username;
-        } else $_SESSION['role'] = -1;
-        return $_SESSION['role'];
+            if (!isset($result)) return -1;
+            return $result;
+        }
+        return -1;
+    }
+
+    public static function backupDB() {
+        $dbhost   = "localhost";
+        $dbuser   = "root";
+        $dbpwd    = "root";
+        $dbname   = "practice";
+        $dumpfile = "OTPS.sql";
+
+        passthru("e:/Coding/MAMP/bin/mysql/bin/mysqldump --opt --host=$dbhost --user=$dbuser --password=$dbpwd $dbname > $dumpfile");
     }
 }

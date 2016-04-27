@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <?php if($_SESSION['role'] == 1 || $_SESSION['role'] == 0):?>
+    <?php if(($_SESSION['role'] == 1 || $_SESSION['role'] == 0) && $_SESSION['role'] != NULL):?>
     <div class="row content">
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
@@ -24,7 +24,9 @@
                             <li class="active"><a href="#">Студенты<span class="sr-only">(current)</span></a></li>
                             <li><a href="#">Договоры</a></li>
                             <li><a href="#">Компании</a></li>
-
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/OPTS/index.php?page=Login">Выход</a></li>
                         </ul>
                     </div><!-- /.navbar-collapse -->
                 </div><!-- /.container-fluid -->

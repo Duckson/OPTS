@@ -3,13 +3,17 @@
 class Login extends AbstractPage
 {
     protected $view_file = '/views/login.php';// говорим какое представление использовать
-    protected $title = 'Index';
+    protected $title = 'Login';
 
     protected function content()
     {
-        var_dump($_POST);
-        $check = Post::checkUser($_POST['username'], $_POST['password']);
-        if ($check != -1) header("Location: ./index.php?page=Index");
-        var_dump($check);
+        if (!empty($_POST['username']) && !empty($_POST['username'])) {
+            $result = Post::checkUser($_POST['username'], $_POST['password']);
+            var_dump($result);
+            if ($result != -1) {
+                $_SESSION['role'] = $result['role'];
+                header("Location: /OPTS/index.php?page=Index");
+            } else $_SESSION['role'] = -1;
+        } else $_SESSION['role'] = -1;
     }
 }
