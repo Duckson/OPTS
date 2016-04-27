@@ -3,6 +3,7 @@ class Config{
     public $db;// (1) нельзя создать подключение не в методе, поэтому просто объявляем поле
     private function __construct(){ // (2) вот наш метод который создаст подключение
         $this->db=new mysqli('localhost', 'root', 'root', "practice");
+        $this->db->set_charset('utf8');
     }
     // но мы не хотим каждый раз создавать новое подключение и плодить объекты конфигов
     private static $instance=null;

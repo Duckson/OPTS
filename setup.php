@@ -1,9 +1,10 @@
 <?php
 
-$dbhost   = "localhost";
-$dbuser   = "root";
-$dbpwd    = "root";
-$dbname   = "practice";
-$dumpfile = "OPTS.sql";
+$root = $_SERVER['DOCUMENT_ROOT'] . "/OPTS/";
+require($root . 'model/Config.php');
 
-exec("e:/Coding/MAMP/bin/mysql/bin/mysql --host=$dbhost --user=$dbuser --password=$dbpwd $dbname < $dumpfile");
+$file = file_get_contents($root . 'OPTS.sql');
+$sql = Config::get()->db;
+$sql->query($file);
+$error = $sql->error;
+var_dump($error);
