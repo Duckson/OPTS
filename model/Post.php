@@ -86,9 +86,9 @@ class Post
         var_dump($password);
         $password = md5($password);
         $result = $sql->query("SELECT role FROM users WHERE login='$username' AND password='$password'");
-        $result = $result->fetch_array();
 
         if($result != 0){
+            $result = $result->fetch_array();
             $_SESSION['role'] = $result['role'];
             $_SESSION['username'] = $username;
         } else $_SESSION['role'] = -1;
