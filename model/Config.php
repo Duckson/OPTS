@@ -15,4 +15,13 @@ class Config{
         }
         return Config::$instance;
     }
+
+    public static function Loader($class)
+    {
+        $full_class_name = explode('\\', $class);
+        list($namespace, $class) = $full_class_name;
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/OPTS/';
+
+        include $path . $namespace. '/' . $class . '.php';
+    }
 }

@@ -19,7 +19,7 @@ class DefaultController extends \AbstractPage
         $data = [];
 
         if (!empty($_POST['username']) && !empty($_POST['password'])) {
-            $result = \Post::checkUser($_POST['username'], $_POST['password']);
+            $result = \DB::checkUser($_POST['username'], $_POST['password']);
             if ($result != -1) {
                 $_SESSION['role'] = $result['role'];
                 header("Location: /OPTS/index.php?page=DefaultController/students");
@@ -40,7 +40,7 @@ class DefaultController extends \AbstractPage
     public function contractsAction()
     {
         $this->post();
-        $data = \Post::get('contracts');
+        $data = \DB::get('contracts');
         $this->title = 'Контракты';
         $this->render('views/default/login.php', $data);
     }
@@ -50,11 +50,11 @@ class DefaultController extends \AbstractPage
         if ($_SESSION['role'] == -1) header("Location: /OPTS/students.php?page=Login");
 
         if (!empty($_POST['name']) && !empty($_POST['last_name']) && !empty($_POST['patronymic'])) {
-            \Post::addStudent($_POST['last_name'], $_POST['name'], $_POST['patronymic']);
+            \DB::addStudent($_POST['last_name'], $_POST['name'], $_POST['patronymic']);
         }
 
         if (!empty($_POST['company']) && !empty($_POST['formation_date']) && !empty($_POST['contr_text'])) {
-            \Post::addContract($_POST['company'], $_POST['formation_date'], $_POST['contr_text']);
+            \DB::addContract($_POST['company'], $_POST['formation_date'], $_POST['contr_text']);
         }
 
 
@@ -62,10 +62,10 @@ class DefaultController extends \AbstractPage
 
     protected function getAll()
     {
-        $result['all'] = \Post::get();
-        $result['contracts'] = \Post::get('contracts');
-        $result['companies'] = \Post::get('companies');
-        $result['types'] = \Post::get('types');
+        $result['all'] = \DB::get();
+        $result['contracts'] = \DB::get('contracts');
+        $result['companies'] = \DB::get('companies');
+        $result['types'] = \DB::get('types');
 
         return $result;
     }
