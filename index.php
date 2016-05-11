@@ -2,27 +2,11 @@
 session_start();
 date_default_timezone_set("UTC");
 
-/*$root = $_SERVER['DOCUMENT_ROOT'] . "/OPTS/";
-require($root . 'core/AbstractPage.php');
-require($root . 'core/AddingPage.php');
-require($root . 'model/Post.php');
-require($root . 'model/Config.php');
-spl_autoload_register('Post::Loader');
-$class_name = $_GET['page'];
-$page = new $class_name();
-
-try {                                                        
-    $page->run();                               
-} catch (Exception $e) {
-    $err_page = new Error($e);
-    $err_page->run();
-}*/
-
 $root = $_SERVER['DOCUMENT_ROOT'] . "/OPTS/";
 require($root . 'core/AbstractPage.php');
-require($root . 'model/Post.php');
+require($root . 'model/DB.php');
 require($root . 'model/Config.php');
-spl_autoload_register('\Post::Loader');
+spl_autoload_register('\Config::Loader');
 
 $route = isset($_GET['page'])?explode('/',$_GET['page']):['DefaultController','login']; // если не передана страница, считаем что передано default/index
 if(count($route)<2) $route[]='login'; // если передано, но не разделилось на 2 части, то считаем что вторая часть index
