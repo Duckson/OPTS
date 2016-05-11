@@ -76,9 +76,11 @@ class Post
 
     public static function Loader($class)
     {
-        $path = $_SERVER['DOCUMENT_ROOT'] . '/OPTS/pages/';
+        $full_class_name = explode('\\', $class);
+        list($namespace, $class) = $full_class_name;
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/OPTS/';
 
-        include $path . $class . '.php';
+        include $path . $namespace. '/' . $class . '.php';
     }
 
     public static function checkUser($username, $password)
@@ -95,98 +97,75 @@ class Post
         return -1;
     }
 
-    public static function getAll($result = "all")
+    public static function get($result = "all")
     {
-        /**$sql = Config::get()->db;
-         * $students_table = $sql->query("SELECT * FROM students");
-         * $links_table = $sql->query("SELECT * FROM student_app_link");
-         * $apps_table = $sql->query("SELECT * FROM applications");
-         * $contracts_table = $sql->query("SELECT * FROM contracts");
-         * $i = 0;
-         *
-         * $result_table = $sql->query("SELECT students.last_name, students.first_name, students.patronymic,
-         * FROM students
-         * INNER JOIN student_app_link
-         * WHERE student_app_link.");
-         *
-         * while ($student = $students_table->fetch_array) $students[] = $student;
-         * while ($link = $links_table) $links[] = $link;
-         * while ($app = $apps_table) $apps[] = $app;
-         * while ($contract = $contracts_table) $contracts[] = $contract;
-         *
-         * foreach ($students as $student) {
-         * $result[$i] = $student;
-         * foreach ($links as $link) {
-         * if ($link['student_id'] == $student['id']) {
-         * $result[$i]['app_id'] = $link['app_id'];
-         * foreach ($apps as $app) {
-         * if ($app['id'] = $link['app_id']) {
-         * $result[$i]['app_start'] = $app['start_date'];
-         * $result[$i]['app_end'] = $app['end_date'];
-         * foreach ($contract as $contract) {
-         * }
-         * }
-         * }
-         * }
-         *
-         * }
-         * }
-         * $i++;
-         * }
-         * return $result;*/
         $sql = Config::get()->db;
-        $data = $sql->query("
-    SELECT students.id st_id,
-	students.first_name st_f_name,
-	students.last_name st_l_name,
-	students.patronymic st_patro,
-	applications.id app_id, 
-	applications.start_date app_start,
-    applications.end_date app_end,
-	contracts.id contr_id,
-	contracts.text contr_text,
-	contracts.formation_date contr_date,
-	companies.name company_name
-FROM students 
-  LEFT JOIN student_app_link ON(student_app_link.student_id = students.id)
-  LEFT JOIN applications ON(student_app_link.app_id = applications.id)
-  LEFT JOIN contracts ON(contracts.id = applications.contract_id)
-  LEFT JOIN companies ON (companies.id = contracts.company_id)
-");
-        echo $sql->error;
-
-        $apps = []; // [int=>[start,end,contract]]
-        $contracts = [];// [int=>[text,date]]
-        while ($row = $data->fetch_array()) {
-            $all[] = $row;
-
-            if ($row['app_id']) {
-                if (!isset($apps[$row['app_id']])) {
-                    $apps[$row['app_id']] = [
-                        'start' => $row['app_start'],
-                        'end' => $row['app_end'],
-                        'contract_id' => $row['contr_id']
-                    ];
+        switch ($result) {
+            default:
+                $data = $sql->query("
+            SELECT students.id st_id,
+            	students.first_name st_f_name,
+            	students.last_name st_l_name,
+            	students.patronymic st_patro,
+            	applications.id app_id, 
+            	applications.start_date app_start,
+                applications.end_date app_end,
+            	contracts.id contr_id,
+            	contracts.text contr_text,
+            	contracts.formation_date contr_date,
+            	companies.name company_name
+            FROM students 
+                LEFT JOIN student_app_link ON(student_app_link.student_id = students.id)
+                LEFT JOIN applications ON(student_app_link.app_id = applications.id)
+                LEFT JOIN contracts ON(contracts.id = applications.contract_id)
+                LEFT JOIN companies ON(companies.id = contracts.company_id)
+            ORDER BY students.last_name ASC, students.first_name ASC
+                  ");
+                echo $sql->error;
+                while ($row = $data->fetch_array()) {
+                    $all[] = $row;
                 }
-
-                if (!isset($contracts[$row['contr_id']])) {
-                    $contracts[$row['contr_id']] = [
-                        'text' => $row['contr_text'],
-                        'date' => $row['contr_date']
-                    ];
+                return $all;
+                break;
+            case "contracts":
+                $data = $sql->query("SELECT * FROM contracts");
+                while ($row = $data->fetch_assoc()) {
+                    $contracts[] = $row;
                 }
-            }
+                return $contracts;
+            case "companies":
+                $data = $sql->query("SELECT * FROM companies");
+                while ($row = $data->fetch_assoc()) {
+                    $companies[] = $row;
+                }
+                return $companies;
+            case 'types':
+                $data = $sql->query("SELECT * FROM practice_types");
+                while ($row = $data->fetch_assoc()) {
+                    $types[] = $row;
+                }
+                return $types;
         }
-        if ($result == "all") return $all;
+
+
     }
 
-    public static function addStudent($last_name, $name, $patronymic) {
+    public static function addStudent($last_name, $name, $patronymic)
+    {
         $sql = Config::get()->db;
         $name = ucfirst($name);
         $last_name = ucfirst($last_name);
         $patronymic = ucfirst($patronymic);
 
         $sql->query("INSERT INTO students(first_name, last_name, patronymic) VALUES ('$name', '$last_name', '$patronymic')");
+        echo $sql->error;
+    }
+
+    public static function addContract($company, $date, $text)
+    {
+        $sql = Config::get()->db;
+
+        $sql->query("INSERT INTO contracts(company_id, formation_date, text) VALUES ('$company', '$date', '$text')");
         echo $sql->error;
     }
 

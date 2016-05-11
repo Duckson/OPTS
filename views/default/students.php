@@ -1,14 +1,3 @@
-<div class="col-sm-2">
-    <?php if ($_SESSION['role'] == 1): ?>
-    <b>Добавить студента</b></br>
-    <form action="index.php?page=Students" method="post">
-        Фамилия</br><input type="text" name="last_name"></br>
-        Имя</br><input type="text" name="name"></br>
-        Отчество</br><input type="text" name="patronymic"></br></br>
-        <input type="submit" value="Добавить">
-    </form>
-    <?php endif ?>
-</div>
 <div class="col-sm-8">
     <table class="table table-hover table-condensed">
         <tr>
@@ -20,7 +9,7 @@
             <th>Конец практики</th>
             <th>Компания</th>
         </tr>
-        <? foreach ($page_data as $student): ?>
+        <? foreach ($page_data['all'] as $student): ?>
             <tr>
                 <td><?= $student['st_l_name'] ?></td>
                 <td><?= $student['st_f_name'] ?></td>
@@ -37,4 +26,12 @@
         <? endforeach; ?>
     </table>
 </div>
-<div class="col-sm-2"></div>
+<div class="col-sm-2">
+    <b>Нет данных о прохождении практики:</b><br>
+    <? foreach ($page_data['all'] as $student): ?>
+        <?php if (!$student['app_id']): ?>
+            <?=$student['st_l_name'] . " " . $student['st_f_name'] . " " . $student['st_patro'] . "<br>"?>
+        <?php endif ?>
+    <? endforeach; ?>
+
+</div>
