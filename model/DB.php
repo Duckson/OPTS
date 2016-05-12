@@ -16,12 +16,10 @@ class DB
         return -1;
     }
 
-    public static function get($result = "all")
+    public static function getStudents()
     {
         $sql = Config::get()->db;
-        switch ($result) {
-            default:
-                $data = $sql->query("
+        $data = $sql->query("
             SELECT students.id st_id,
             	students.first_name st_f_name,
             	students.last_name st_l_name,
@@ -40,33 +38,50 @@ class DB
                 LEFT JOIN companies ON(companies.id = contracts.company_id)
             ORDER BY students.last_name ASC, students.first_name ASC
                   ");
-                echo $sql->error;
-                while ($row = $data->fetch_array()) {
-                    $all[] = $row;
-                }
-                return $all;
-                break;
-            case "contracts":
-                $data = $sql->query("SELECT * FROM contracts");
-                while ($row = $data->fetch_assoc()) {
-                    $contracts[] = $row;
-                }
-                return $contracts;
-            case "companies":
-                $data = $sql->query("SELECT * FROM companies");
-                while ($row = $data->fetch_assoc()) {
-                    $companies[] = $row;
-                }
-                return $companies;
-            case 'types':
-                $data = $sql->query("SELECT * FROM practice_types");
-                while ($row = $data->fetch_assoc()) {
-                    $types[] = $row;
-                }
-                return $types;
+        echo $sql->error;
+        while ($row = $data->fetch_array()) {
+            $all[] = $row;
         }
+        return $all;
+    }
 
 
+    public static function query($query)
+    {
+        $sql = Config::get()->db;
+        $data = $sql->query($query);
+        $result = [];
+        if (!$data)
+            throw new \Exception($sql->error);
+        while ($row = $data->fetch_assoc()) {
+            $result[] = $row;
+        }
+        return $result;
+    }
+
+
+    public static function getApps()
+    {
+        $sql = Config::get()->db;
+        $data = $sql->query("
+            SELECT applications.id id,
+                   applications.start_date app_start,
+                   applications.end_date app_end,
+                   contracts.id contr_id,
+                   contracts.formation_date contr_date,
+                   companies.name company,
+                   practice_types.type practice_type
+            FROM applications
+            LEFT JOIN contracts ON (applications.contract_id = contracts.id)
+            LEFT JOIN companies ON (contracts.company_id = companies.id)
+            LEFT JOIN practice_types ON (applications.practice_id = practice_types.id)
+        ");
+        
+        echo $sql->error;
+        while ($row = $data->fetch_array()) {
+            $all[] = $row;
+        }
+        return $all;
     }
 
     public static function addStudent($last_name, $name, $patronymic)
@@ -93,6 +108,5 @@ class DB
         $sql = Config::get()->db;
         $students_table = $sql->query("SELECT * FROM students");
         while ($student = $students_table->fetch_array()) $students[] = $student;
-        var_dump($students);
     }
 }

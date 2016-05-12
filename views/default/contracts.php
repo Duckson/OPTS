@@ -1,29 +1,31 @@
 <div class="col-sm-8">
-    <table class="table table-hover table-condensed">
-        <tr>
-            <th>Фамилия</th>
-            <th>Имя</th>
-            <th>Отчество</th>
-            <th>Практика</th>
-            <th>Начало практики</th>
-            <th>Конец практики</th>
-            <th>Компания</th>
-        </tr>
-        <? foreach ($page_data as $student): ?>
+    <? foreach ($page_data['contracts'] as $contract): ?>
+        <h2>Контракт <?= $contract['id']?></h2>
+        <table class="table table-hover table-condensed table-bordered">
             <tr>
-                <td><?= $student['st_l_name'] ?></td>
-                <td><?= $student['st_f_name'] ?></td>
-                <td><?= $student['st_patro'] ?></td>
-                <?php if ($student['app_id']): ?>
-                    <td class="success"></td>
-                <?php else: ?>
-                    <td class="danger"></td>
-                <?php endif ?>
-                <td><?= $student['app_start'] ?></td>
-                <td><?= $student['app_end'] ?></td>
-                <td><?= $student['company_name'] ?></td>
+                <th>Дата старта</th>
+                <th>Дата конца</th>
+                <th>Компания</th>
+                <th>Дата подписания контракта</th>
+                <th>Тип практики</th>
+                <th>Студенты</th>
             </tr>
-        <? endforeach; ?>
-    </table>
+            <? foreach ($page_data['apps'] as $app): ?>
+                <?php if ($contract['id'] == $app['contr_id']): ?>
+                    <tr>
+                        <td><?= $app['app_start'] ?></td>
+                        <td><?= $app['app_end'] ?></td>
+                        <td><?= $app['company'] ?></td>
+                        <td><?= $app['contr_date'] ?></td>
+                        <td><?= $app['practice_type'] ?></td>
+                        <td>
+                            <?php foreach ($app['students'] as $student)
+                                echo $student['last_name'] . ' ' . $student['first_name'] . ' ' . $student['patronymic'] . '<br>'; ?>
+                        </td>
+                    </tr>
+                <?php endif ?>
+            <? endforeach; ?>
+        </table>
+        <button class="temp">Добавить приложение</button>
+    <? endforeach; ?>
 </div>
-<div class="col-sm-2"></div>

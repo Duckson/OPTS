@@ -15,7 +15,6 @@ class DefaultController extends \AbstractPage
     // и этот метод - другая страница
     public function loginAction()
     {
-        $this->post();
         $data = [];
 
         if (!empty($_POST['username']) && !empty($_POST['password'])) {
@@ -33,22 +32,36 @@ class DefaultController extends \AbstractPage
     // и даже этот метод - третья страница, но он всегда перенаправляет на другую, и не отдаёт html
     public function logoutAction()
     {
-
-        header('Locaton: /?page=Default/index');
+        $_SESSION['role'] = -1;
+        header('Locaton: /?page=DefaultController/login');
     }
 
     public function contractsAction()
     {
         $this->post();
-        $data = \DB::get('contracts');
+        $apps = \DB::getApps();
+        $students = \DB::query('SELECT * FROM students');
+        $links = \DB::query('SELECT * FROM student_app_link');
+        $contracts = \DB::query('SELECT * FROM contracts');
+
+        foreach ($links as $link){
+            foreach ($apps as $key=>$app){
+                if($link['app_id'] == $app['id'])
+                    foreach ($students as $s_key=>$student){
+                        if($link['student_id'] == $student['id'])
+                            $apps[$key]['students'][] = $student;
+                    }
+            }
+        }
+        
+        $result['apps'] = $apps;
+        $result['contracts'] = $contracts;
         $this->title = 'Контракты';
-        $this->render('views/default/login.php', $data);
+        $this->render('views/default/contracts.php', $result);
     }
 
     protected function post()
     {
-        if ($_SESSION['role'] == -1) header("Location: /OPTS/students.php?page=Login");
-
         if (!empty($_POST['name']) && !empty($_POST['last_name']) && !empty($_POST['patronymic'])) {
             \DB::addStudent($_POST['last_name'], $_POST['name'], $_POST['patronymic']);
         }
@@ -56,16 +69,14 @@ class DefaultController extends \AbstractPage
         if (!empty($_POST['company']) && !empty($_POST['formation_date']) && !empty($_POST['contr_text'])) {
             \DB::addContract($_POST['company'], $_POST['formation_date'], $_POST['contr_text']);
         }
-
-
     }
 
     protected function getAll()
     {
-        $result['all'] = \DB::get();
-        $result['contracts'] = \DB::get('contracts');
-        $result['companies'] = \DB::get('companies');
-        $result['types'] = \DB::get('types');
+        $result['all'] = \DB::getStudents();
+        $result['contracts'] = \DB::query('SELECT * FROM contracts');
+        $result['companies'] = \DB::query('SELECT * FROM companies');
+        $result['types'] = \DB::query('SELECT * FROM practice_types');
 
         return $result;
     }

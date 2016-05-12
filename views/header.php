@@ -22,8 +22,8 @@
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav">
-                            <li><a href="#">Студенты<span class="sr-only">(current)</span></a></li>
-                            <li><a href="#">Контракты</a></li>
+                            <li><a href="index.php?page=DefaultController/students">Студенты<span class="sr-only">(current)</span></a></li>
+                            <li><a href="index.php?page=DefaultController/contracts">Контракты</a></li>
                             <li><a href="#">Компании</a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
