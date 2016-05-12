@@ -51,6 +51,7 @@ class DB
         $sql = Config::get()->db;
         $data = $sql->query($query);
         $result = [];
+        echo $sql->error;
         if (!$data)
             throw new \Exception($sql->error);
         while ($row = $data->fetch_assoc()) {

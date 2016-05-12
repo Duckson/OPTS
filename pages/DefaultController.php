@@ -42,7 +42,13 @@ class DefaultController extends \AbstractPage
         $apps = \DB::getApps();
         $students = \DB::query('SELECT * FROM students');
         $links = \DB::query('SELECT * FROM student_app_link');
-        $contracts = \DB::query('SELECT * FROM contracts');
+        $contracts = \DB::query('
+                                 SELECT contracts.id id,
+                                        contracts.formation_date f_date,
+                                        companies.name company_name
+                                 FROM contracts
+                                 LEFT JOIN companies ON (companies.id = contracts.company_id)
+                                 ');
 
         foreach ($links as $link){
             foreach ($apps as $key=>$app){

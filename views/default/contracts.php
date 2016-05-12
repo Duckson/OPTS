@@ -1,6 +1,6 @@
 <div class="col-sm-8">
     <? foreach ($page_data['contracts'] as $contract): ?>
-        <h2>Контракт <?= $contract['id']?></h2>
+        <h2>Контракт <?= $contract['id']?></h2> с компанией <?= $contract['company_name'] ?>
         <table class="table table-hover table-condensed table-bordered">
             <tr>
                 <th>Дата старта</th>
