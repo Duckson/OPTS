@@ -1,4 +1,27 @@
-<div class="col-sm-8">
+<div class="col-sm-3">
+    <h3 class="text-center">Фильтр</h3>
+    <form action="index.php?page=DefaultController/students" method="post">
+        Фамилия <input type="text" name="last_name" value="<?= $_POST['last_name'] ?>"><br>
+        Имя <input type="text" name="first_name" value="<?= $_POST['first_name'] ?>"><br>
+        Отчество <input type="text" name="patronymic" value="<?= $_POST['patronymic'] ?>"><br>
+        Дата начала практики <input type="date" name="start_date" value="<?= $_POST['start_date'] ?>"><br>
+        Дата конца практики <input type="date" name="end_date" value="<?= $_POST['end_date'] ?>"><br>
+        Компания <input type="text" name="company" value="<?= $_POST['company'] ?>"><br>
+        Проходит практику? <select name="practice" id="sel">
+                <option value="meh">Без разницы</option>
+                <option value="yes">Да</option>
+                <option value="no">Нет</option>
+            </select><br>
+        <script>
+            document.getElementById('sel').value = "<?= $_POST['practice']?>";
+        </script>
+            <input type="submit" value="Применить">
+    </form>
+    <form action="index.php?page=DefaultController/students" method="post">
+        <input type="submit" value="Очистить">
+    </form>
+</div>
+<div class="col-sm-9">
     <table class="table table-hover table-condensed">
         <tr>
             <th>Фамилия</th>
@@ -26,12 +49,4 @@
         <? endforeach; ?>
     </table>
 </div>
-<div class="col-sm-2">
-    <b>Нет данных о прохождении практики:</b><br>
-    <? foreach ($page_data['all'] as $student): ?>
-        <?php if (!$student['app_id']): ?>
-            <?=$student['st_l_name'] . " " . $student['st_f_name'] . " " . $student['st_patro'] . "<br>"?>
-        <?php endif ?>
-    <? endforeach; ?>
 
-</div>

@@ -1,31 +1,24 @@
 <div class="col-sm-8">
-    <? foreach ($page_data['contracts'] as $contract): ?>
-        <h2>Контракт <?= $contract['id']?></h2> с компанией <?= $contract['company_name'] ?>
-        <table class="table table-hover table-condensed table-bordered">
+    <h2 class="text-center">Контракты</h2><br>
+    <table class="table table-condensed table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Компания</th>
+            <th>Дата подписания</th>
+            <th>Приложения</th>
+        </tr>
+        </thead>
+        <tbody>
+        <? foreach ($page_data['contracts'] as $contract): ?>
             <tr>
-                <th>Дата старта</th>
-                <th>Дата конца</th>
-                <th>Компания</th>
-                <th>Дата подписания контракта</th>
-                <th>Тип практики</th>
-                <th>Студенты</th>
+                <td><?= $contract['id'] ?></td>
+                <td><?= $contract['company_name'] ?></td>
+                <td><?= $contract['f_date'] ?></td>
+                <td><a href="index.php?page=DefaultController/apps&id=<?= $contract['id'] ?>"><button>Посмотреть</button></a></td>
             </tr>
-            <? foreach ($page_data['apps'] as $app): ?>
-                <?php if ($contract['id'] == $app['contr_id']): ?>
-                    <tr>
-                        <td><?= $app['app_start'] ?></td>
-                        <td><?= $app['app_end'] ?></td>
-                        <td><?= $app['company'] ?></td>
-                        <td><?= $app['contr_date'] ?></td>
-                        <td><?= $app['practice_type'] ?></td>
-                        <td>
-                            <?php foreach ($app['students'] as $student)
-                                echo $student['last_name'] . ' ' . $student['first_name'] . ' ' . $student['patronymic'] . '<br>'; ?>
-                        </td>
-                    </tr>
-                <?php endif ?>
-            <? endforeach; ?>
-        </table>
-        <button class="temp">Добавить приложение</button>
-    <? endforeach; ?>
+        <? endforeach; ?>
+        </tbody>
+    </table>
+    <button class="temp">Добавить контракт</button>
 </div>

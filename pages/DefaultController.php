@@ -6,10 +6,40 @@ class DefaultController extends \AbstractPage
     // этот метод - одна страница
     public function studentsAction()
     {
-        $this->post();
         $data = $this->getAll();
+        $data['all'] = $this->studentsFilter($data['all']);
         $this->title = 'Студенты';
         $this->render('views/default/students.php', $data);
+    }
+
+    protected function studentsFilter($students){
+        foreach ($students as $key=>$student){
+            if(!empty($_POST['first_name']) && $student['st_f_name'] != $_POST['first_name'])
+                unset($students[$key]);
+            if(!empty($_POST['last_name']) && $student['st_l_name'] != $_POST['last_name'])
+                unset($students[$key]);
+            if(!empty($_POST['patronymic']) && $student['st_patro'] != $_POST['patronymic'])
+                unset($students[$key]);
+            if(!empty($_POST['start_date']) && $student['app_start'] != $_POST['start_date'])
+                unset($students[$key]);
+            if(!empty($_POST['end_date']) && $student['app_end'] != $_POST['end_date'])
+                unset($students[$key]);
+            if(!empty($_POST['company']) && $student['company_name'] != $_POST['company'])
+                unset($students[$key]);
+            switch ($_POST['practice']){
+                case 'yes':
+                    if(empty($student['app_id']))
+                        unset($students[$key]);
+                    break;
+                case 'no':
+                    if(!empty($student['app_id']))
+                        unset($students[$key]);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return $students;
     }
 
     // и этот метод - другая страница
@@ -39,31 +69,44 @@ class DefaultController extends \AbstractPage
     public function contractsAction()
     {
         $this->post();
-        $apps = \DB::getApps();
-        $students = \DB::query('SELECT * FROM students');
-        $links = \DB::query('SELECT * FROM student_app_link');
-        $contracts = \DB::query('
-                                 SELECT contracts.id id,
+        $contracts = \DB::query('SELECT contracts.id id,
                                         contracts.formation_date f_date,
                                         companies.name company_name
                                  FROM contracts
                                  LEFT JOIN companies ON (companies.id = contracts.company_id)
                                  ');
 
-        foreach ($links as $link){
-            foreach ($apps as $key=>$app){
-                if($link['app_id'] == $app['id'])
-                    foreach ($students as $s_key=>$student){
-                        if($link['student_id'] == $student['id'])
-                            $apps[$key]['students'][] = $student;
-                    }
-            }
-        }
-        
-        $result['apps'] = $apps;
         $result['contracts'] = $contracts;
         $this->title = 'Контракты';
         $this->render('views/default/contracts.php', $result);
+    }
+
+    public function appsAction()
+    {
+        $this->post();
+        $id = $_GET['id'];
+        if (!empty($id)) {
+            $apps = \DB::getApps($id);
+            if(!empty($apps)) {
+                $students = \DB::query('SELECT * FROM students');
+                $links = \DB::query('SELECT * FROM student_app_link');
+
+                foreach ($links as $link) {
+                    foreach ($apps as $key => $app) {
+                        if ($link['app_id'] == $app['id'])
+                            foreach ($students as $s_key => $student) {
+                                if ($link['student_id'] == $student['id'])
+                                    $apps[$key]['students'][] = $student;
+                            }
+                    }
+                }
+            }
+
+            $result['apps'] = $apps;
+            $result['id'] = $id;
+            $this->title = 'Приложения';
+            $this->render('views/default/apps.php', $result);
+        } else $this->render('views/default/error.php', '');
     }
 
     protected function post()

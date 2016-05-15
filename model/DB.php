@@ -61,7 +61,7 @@ class DB
     }
 
 
-    public static function getApps()
+    public static function getApps($id)
     {
         $sql = Config::get()->db;
         $data = $sql->query("
@@ -76,6 +76,7 @@ class DB
             LEFT JOIN contracts ON (applications.contract_id = contracts.id)
             LEFT JOIN companies ON (contracts.company_id = companies.id)
             LEFT JOIN practice_types ON (applications.practice_id = practice_types.id)
+            WHERE contracts.id = '$id'
         ");
         
         echo $sql->error;
