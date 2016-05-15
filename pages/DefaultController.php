@@ -7,40 +7,10 @@ class DefaultController extends \AbstractPage
     public function studentsAction()
     {
         $data = $this->getAll();
-        $data['all'] = $this->studentsFilter($data['all']);
         $this->title = 'Студенты';
         $this->render('views/default/students.php', $data);
     }
 
-    protected function studentsFilter($students){
-        foreach ($students as $key=>$student){
-            if(!empty($_POST['first_name']) && $student['st_f_name'] != $_POST['first_name'])
-                unset($students[$key]);
-            if(!empty($_POST['last_name']) && $student['st_l_name'] != $_POST['last_name'])
-                unset($students[$key]);
-            if(!empty($_POST['patronymic']) && $student['st_patro'] != $_POST['patronymic'])
-                unset($students[$key]);
-            if(!empty($_POST['start_date']) && $student['app_start'] != $_POST['start_date'])
-                unset($students[$key]);
-            if(!empty($_POST['end_date']) && $student['app_end'] != $_POST['end_date'])
-                unset($students[$key]);
-            if(!empty($_POST['company']) && $student['company_name'] != $_POST['company'])
-                unset($students[$key]);
-            switch ($_POST['practice']){
-                case 'yes':
-                    if(empty($student['app_id']))
-                        unset($students[$key]);
-                    break;
-                case 'no':
-                    if(!empty($student['app_id']))
-                        unset($students[$key]);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return $students;
-    }
 
     // и этот метод - другая страница
     public function loginAction()
@@ -122,7 +92,53 @@ class DefaultController extends \AbstractPage
 
     protected function getAll()
     {
-        $result['all'] = \DB::getStudents();
+        $query = "SELECT students.id st_id,
+            	students.first_name st_f_name,
+            	students.last_name st_l_name,
+            	students.patronymic st_patro,
+            	applications.id app_id, 
+            	applications.start_date app_start,
+                applications.end_date app_end,
+            	contracts.id contr_id,
+            	contracts.text contr_text,
+            	contracts.formation_date contr_date,
+            	companies.name company_name
+            FROM students 
+                LEFT JOIN student_app_link ON(student_app_link.student_id = students.id)
+                LEFT JOIN applications ON(student_app_link.app_id = applications.id)
+                LEFT JOIN contracts ON(contracts.id = applications.contract_id)
+                LEFT JOIN companies ON(companies.id = contracts.company_id)";
+        $where=[];
+        if(!empty($_POST['first_name']))
+            $where[]="students.first_name='{$_POST['first_name']}'";
+        if(!empty($_POST['last_name']))
+            $where[]="students.last_name='{$_POST['last_name']}'";
+        if(!empty($_POST['patronymic']))
+            $where[]="students.patronymic='{$_POST['patronymic']}'";
+        if(!empty($_POST['start_date']))
+            $where[]="applications.start_date='{$_POST['start_date']}'";
+        if(!empty($_POST['end_date']))
+            $where[]="applications.end_date='{$_POST['end_date']}'";
+        if(!empty($_POST['company']))
+            $where[]="company_name='{$_POST['company']}'";
+        switch ($_POST['practice']) {
+            case 'yes':
+                    $where[] = "applications.id IS NOT NULL";
+                break;
+            case 'no':
+                $where[] = "applications.id IS NULL";
+                break;
+            default:
+                break;
+        }
+
+        $where_str='';
+        if(!empty($where)){
+            $where_str=' WHERE '.join(' AND ',$where);
+        }
+        $query.=$where_str;
+
+        $result['all'] = \DB::query($query);
         $result['contracts'] = \DB::query('SELECT * FROM contracts');
         $result['companies'] = \DB::query('SELECT * FROM companies');
         $result['types'] = \DB::query('SELECT * FROM practice_types');
