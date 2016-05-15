@@ -8,13 +8,13 @@
         Дата конца практики <input type="date" name="end_date" value="<?= $_POST['end_date'] ?>"><br>
         Компания <input type="text" name="company" value="<?= $_POST['company'] ?>"><br>
         Проходит практику? <select name="practice" id="sel">
-                <option value="meh">Без разницы</option>
-                <option value="yes">Да</option>
-                <option value="no">Нет</option>
+            <?php
+                $ops = ['meh'=>'Без разницы', 'yes'=>'Да', 'no'=>'Нет'];
+                foreach ($ops as $val=>$name){
+                    echo '<option value="' . $val . '"' . ($_POST['practice'] == 'meh'? "selected='selected'":'') . '>' . $name . '</option>';
+                }
+            ?>
             </select><br>
-        <script>
-            document.getElementById('sel').value = "<?= $_POST['practice']?>";
-        </script>
             <input type="submit" value="Применить">
     </form>
     <form action="index.php?page=DefaultController/students" method="post">
