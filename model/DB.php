@@ -30,32 +30,7 @@ class DB
         }
         return $result;
     }
-
-
-    public static function getApps($id)
-    {
-        $sql = Config::get()->db;
-        $data = $sql->query("
-            SELECT applications.id id,
-                   applications.start_date app_start,
-                   applications.end_date app_end,
-                   contracts.id contr_id,
-                   contracts.formation_date contr_date,
-                   companies.name company,
-                   practice_types.type practice_type
-            FROM applications
-            LEFT JOIN contracts ON (applications.contract_id = contracts.id)
-            LEFT JOIN companies ON (contracts.company_id = companies.id)
-            LEFT JOIN practice_types ON (applications.practice_id = practice_types.id)
-            WHERE contracts.id = '$id'
-        ");
-        
-        echo $sql->error;
-        while ($row = $data->fetch_array()) {
-            $all[] = $row;
-        }
-        return $all;
-    }
+    
 
     public static function addStudent($last_name, $name, $patronymic)
     {
