@@ -48,7 +48,7 @@ class DefaultController extends \AbstractPage
         if(!empty($_POST['с_date']))
             $where[]="contracts.formation_date='{$_POST['с_date']}'";
         if(!empty($_POST['c_name']))
-            $where[]="companies.name='{$_POST['c_name']}'";
+            $where[]="companies.name LIKE '%{$_POST['c_name']}%'";
 
         $where_str='';
         if(!empty($where)){
