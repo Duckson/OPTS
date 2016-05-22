@@ -1,17 +1,17 @@
 <div class="col-sm-3">
     <h3 class="text-center">Фильтр</h3>
     <form action="index.php?page=DefaultController/students" method="post">
-        Фамилия <input type="text" name="last_name" value="<?= $_POST['last_name'] ?>"><br>
-        Имя <input type="text" name="first_name" value="<?= $_POST['first_name'] ?>"><br>
-        Отчество <input type="text" name="patronymic" value="<?= $_POST['patronymic'] ?>"><br>
-        Дата начала практики <input type="date" name="start_date" value="<?= $_POST['start_date'] ?>"><br>
-        Дата конца практики <input type="date" name="end_date" value="<?= $_POST['end_date'] ?>"><br>
-        Компания <input type="text" name="company" value="<?= $_POST['company'] ?>"><br>
-        Проходит практику? <select name="practice" id="sel">
+        Фамилия <input type="text" name="s_last_name" value="<?= htmlspecialchars($_POST['s_last_name']) ?>"><br>
+        Имя <input type="text" name="s_first_name" value="<?= htmlspecialchars($_POST['s_first_name']) ?>"><br>
+        Отчество <input type="text" name="s_patronymic" value="<?= htmlspecialchars($_POST['s_patronymic']) ?>"><br>
+        Дата начала практики <input type="date" name="s_start_date" value="<?= htmlspecialchars($_POST['s_start_date']) ?>"><br>
+        Дата конца практики <input type="date" name="s_end_date" value="<?= htmlspecialchars($_POST['s_end_date']) ?>"><br>
+        Компания <input type="text" name="s_company" value="<?= htmlspecialchars($_POST['s_company']) ?>"><br>
+        Проходит практику? <select name="s_practice" id="sel">
             <?php
                 $ops = ['meh'=>'Без разницы', 'yes'=>'Да', 'no'=>'Нет'];
                 foreach ($ops as $val=>$name){
-                    echo '<option value="' . $val . '"' . ($_POST['practice'] == 'meh'? "selected='selected'":'') . '>' . $name . '</option>';
+                    echo '<option value="' . $val . '"' . ($_POST['s_practice'] == $val? "selected='selected'":'') . '>' . $name . '</option>';
                 }
             ?>
             </select><br>
@@ -22,7 +22,7 @@
     </form>
 </div>
 <div class="col-sm-9">
-    <table class="table table-hover table-condensed">
+    <table class="table table-hover table-condensed table-bordered">
         <tr>
             <th>Фамилия</th>
             <th>Имя</th>

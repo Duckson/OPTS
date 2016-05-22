@@ -38,14 +38,25 @@ class DefaultController extends \AbstractPage
 
     public function contractsAction()
     {
-        $this->post();
-        $contracts = \DB::query('SELECT contracts.id id,
-                                        contracts.formation_date f_date,
-                                        companies.name company_name
-                                 FROM contracts
-                                 LEFT JOIN companies ON (companies.id = contracts.company_id)
-                                 ');
+        $query = 'SELECT contracts.id id,
+                         contracts.formation_date f_date,
+                         companies.name company_name
+                  FROM contracts
+                  LEFT JOIN companies ON (companies.id = contracts.company_id)';
 
+        $where=[];
+        if(!empty($_POST['с_date']))
+            $where[]="contracts.formation_date='{$_POST['с_date']}'";
+        if(!empty($_POST['c_name']))
+            $where[]="companies.name='{$_POST['c_name']}'";
+
+        $where_str='';
+        if(!empty($where)){
+            $where_str=' WHERE '.join(' AND ',$where);
+        }
+        $query.=$where_str;
+
+        $contracts = \DB::query($query);
         $result['contracts'] = $contracts;
         $this->title = 'Контракты';
         $this->render('views/default/contracts.php', $result);
@@ -53,25 +64,64 @@ class DefaultController extends \AbstractPage
 
     public function appsAction()
     {
-        $this->post();
         $id = $_GET['id'];
         if (!empty($id)) {
-            $apps = \DB::getApps($id);
+            $query = "
+            SELECT applications.id id,
+                   applications.start_date app_start,
+                   applications.end_date app_end,
+                   contracts.id contr_id,
+                   contracts.formation_date contr_date,
+                   companies.name company,
+                   practice_types.type practice_type
+            FROM applications
+            LEFT JOIN contracts ON (applications.contract_id = contracts.id)
+            LEFT JOIN companies ON (contracts.company_id = companies.id)
+            LEFT JOIN practice_types ON (applications.practice_id = practice_types.id)
+            WHERE contracts.id = '$id'
+        ";
+            $where=[];
+            if(!empty($_POST['a_start_date']))
+                $where[]="applications.start_date='{$_POST['a_start_date']}'";
+            if(!empty($_POST['a_end_date']))
+                $where[]="applications.end_date='{$_POST['a_end_date']}'";
+            if(!empty($_POST['a_type']) && $_POST['a_type'] != 'meh')
+                $where[]="practice_types.type='{$_POST['a_type']}'";
+
+            $where_str='';
+            if(!empty($where)){
+                $where_str=' AND '.join(' AND ',$where);
+            }
+            $query.=$where_str;
+
+            $apps = \DB::query($query);
             if(!empty($apps)) {
                 $students = \DB::query('SELECT * FROM students');
                 $links = \DB::query('SELECT * FROM student_app_link');
 
-                foreach ($links as $link) {
-                    foreach ($apps as $key => $app) {
+                foreach ($apps as $key => $app) {
+                    $unset = false;
+                    foreach ($links as $link) {
                         if ($link['app_id'] == $app['id'])
                             foreach ($students as $s_key => $student) {
-                                if ($link['student_id'] == $student['id'])
+                                if ($link['student_id'] == $student['id']) {
                                     $apps[$key]['students'][] = $student;
+                                    if(!empty($_POST['a_first_name']) && $_POST['a_first_name'] != $student['first_name'])
+                                        $unset = true;
+                                    if(!empty($_POST['a_last_name']) && $_POST['a_last_name'] != $student['last_name'])
+                                        $unset = true;
+                                    if(!empty($_POST['a_patro']) && $_POST['a_patro'] != $student['patronymic'])
+                                        $unset = true;
+                                }
                             }
                     }
+                    if($unset)
+                        unset($apps[$key]);
                 }
             }
 
+            $types = \DB::query('SELECT practice_types.type p_type FROM practice_types');
+            $result['types'] = $types;
             $result['apps'] = $apps;
             $result['id'] = $id;
             $this->title = 'Приложения';
@@ -79,16 +129,6 @@ class DefaultController extends \AbstractPage
         } else $this->render('views/default/error.php', '');
     }
 
-    protected function post()
-    {
-        if (!empty($_POST['name']) && !empty($_POST['last_name']) && !empty($_POST['patronymic'])) {
-            \DB::addStudent($_POST['last_name'], $_POST['name'], $_POST['patronymic']);
-        }
-
-        if (!empty($_POST['company']) && !empty($_POST['formation_date']) && !empty($_POST['contr_text'])) {
-            \DB::addContract($_POST['company'], $_POST['formation_date'], $_POST['contr_text']);
-        }
-    }
 
     protected function getAll()
     {
@@ -109,19 +149,19 @@ class DefaultController extends \AbstractPage
                 LEFT JOIN contracts ON(contracts.id = applications.contract_id)
                 LEFT JOIN companies ON(companies.id = contracts.company_id)";
         $where=[];
-        if(!empty($_POST['first_name']))
-            $where[]="students.first_name='{$_POST['first_name']}'";
-        if(!empty($_POST['last_name']))
-            $where[]="students.last_name='{$_POST['last_name']}'";
-        if(!empty($_POST['patronymic']))
-            $where[]="students.patronymic='{$_POST['patronymic']}'";
-        if(!empty($_POST['start_date']))
-            $where[]="applications.start_date='{$_POST['start_date']}'";
-        if(!empty($_POST['end_date']))
-            $where[]="applications.end_date='{$_POST['end_date']}'";
-        if(!empty($_POST['company']))
-            $where[]="company_name='{$_POST['company']}'";
-        switch ($_POST['practice']) {
+        if(!empty($_POST['s_first_name']))
+            $where[]="students.first_name='{$_POST['s_first_name']}'";
+        if(!empty($_POST['s_last_name']))
+            $where[]="students.last_name='{$_POST['s_last_name']}'";
+        if(!empty($_POST['s_patronymic']))
+            $where[]="students.patronymic='{$_POST['s_patronymic']}'";
+        if(!empty($_POST['s_start_date']))
+            $where[]="applications.start_date='{$_POST['s_start_date']}'";
+        if(!empty($_POST['s_end_date']))
+            $where[]="applications.end_date='{$_POST['s_end_date']}'";
+        if(!empty($_POST['s_company']))
+            $where[]="company_name='{$_POST['s_company']}'";
+        switch ($_POST['s_practice']) {
             case 'yes':
                     $where[] = "applications.id IS NOT NULL";
                 break;
